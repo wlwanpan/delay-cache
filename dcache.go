@@ -82,7 +82,7 @@ func (c *DCache) StopCycle() {
 }
 
 // Collect delayed entries removed from cache.
-func (c *DCache) Collect() chan<- interface{} {
+func (c *DCache) Collect() <-chan interface{} {
 	return c.out
 }
 
