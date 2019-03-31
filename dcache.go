@@ -20,9 +20,15 @@ type DCache struct {
 
 	queue []string
 
-	out chan interface{}
+	out chan *Collect
 
 	stopWorker chan bool
+}
+
+type Collect struct {
+	key string
+
+	val interface{}
 }
 
 func New(tick time.Duration) *DCache {
@@ -34,7 +40,7 @@ func New(tick time.Duration) *DCache {
 		tick:       tick,
 		entries:    make(map[string]interface{}),
 		queue:      []string{},
-		out:        make(chan interface{}),
+		out:        make(chan *Collect),
 		stopWorker: make(chan bool),
 	}
 }
@@ -49,7 +55,7 @@ func (c *DCache) pop() string {
 	}
 
 	key := c.queue[0]
-	c.queue = c.queue[:len(c.queue)-1]
+	c.queue = c.queue[1:]
 	return key
 }
 
@@ -63,8 +69,12 @@ func (c *DCache) startWorker() {
 			if err != nil {
 				continue
 			}
+
 			delete(c.entries, key)
-			c.out <- entry
+			c.out <- &Collect{
+				key: key,
+				val: entry,
+			}
 		case <-c.stopWorker:
 			return
 		}
@@ -82,7 +92,7 @@ func (c *DCache) StopCycle() {
 }
 
 // Collect delayed entries removed from cache.
-func (c *DCache) Collect() <-chan interface{} {
+func (c *DCache) Collect() <-chan *Collect {
 	return c.out
 }
 
@@ -123,7 +133,10 @@ func (c *DCache) Remove(key string, silent bool) error {
 		return err
 	}
 	if !silent {
-		c.out <- entry
+		c.out <- &Collect{
+			key: key,
+			val: entry,
+		}
 	}
 	delete(c.entries, key)
 	return nil
