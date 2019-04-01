@@ -1,5 +1,6 @@
 # Delay cache
 
+[![Build Status](https://travis-ci.org/wlwanpan/delay-cache.svg?branch=master)](https://travis-ci.org/wlwanpan/delay-cache)
 [![codecov](https://codecov.io/gh/wlwanpan/delay-cache/branch/master/graph/badge.svg)](https://codecov.io/gh/wlwanpan/delay-cache)
 [![GoDoc](https://godoc.org/github.com/wlwanpan/delay-cache?status.svg)](https://godoc.org/github.com/wlwanpan/delay-cache)
 
