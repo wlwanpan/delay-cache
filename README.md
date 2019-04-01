@@ -15,6 +15,8 @@ in a read-only channel.
 go get github.com/wlwanpan/delay-cache
 ```
 
+## Usage
+
 - Basic example
 ```go
 dcache = dcache.New(5 * time.Second)
@@ -27,4 +29,25 @@ val, err := dcache.Get("key")
 
 has := dcache.Has("key")
 ...
+```
+
+- Collecting delayed entry
+```go
+dcache = dcache.New(5 * time.Second)
+
+dcache.Set("key1", "val1")
+dcache.Set("key2", "val2")
+dcache.Set("key3", "val3")
+
+dcache.StartCycle()
+
+for {
+    select {
+        case entry := <- dcache.Collect():
+            // 1st select to be collected: &Collect{key: "key1", val: "val1"}
+            // 2nd select after 5 seconds: &Collect{key: "key2", val: "val3"}
+            // ...
+    }
+}
+
 ```
